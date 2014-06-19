@@ -3,9 +3,11 @@ from flask import Flask
 from database import db_session
 from models.listing import Listing
 from flask.ext.restful import Resource, Api, fields, marshal_with
+from flask.ext.restful.utils import cors
 
 app = Flask(__name__)
 api = Api(app)
+api.decorators=[cors.crossdomain(origin='*')]
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
