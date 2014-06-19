@@ -1,13 +1,12 @@
 import os
 from flask import Flask
+from database import db_session
 
 app = Flask(__name__)
 
-if os.environ['FLASK_MODE'] == 'STAGING':
-	from werkzeug.debug import DebuggedApplication
-	app = DebuggedApplication(app, evalex=True)
-
-
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
 @app.route('/')
 def hello_world():

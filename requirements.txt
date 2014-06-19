@@ -1,5 +1,8 @@
 gunicorn
+sqlalchemy
 flask
 flask-sqlalchemy
-geoalchemy
+geoalchemy2
 flask-restful
+librets
+psycopg2
