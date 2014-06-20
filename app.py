@@ -30,7 +30,7 @@ class ListingsRoute(Resource):
     def get(self):
         return {'listings': marshal(db_session.query(Listing).all(), listing_fields)}
 
-api.add_resource(ListingsRoute, '/listings')
+api.add_resource(ListingsRoute, '/api/listings')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
