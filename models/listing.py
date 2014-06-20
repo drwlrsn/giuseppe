@@ -68,7 +68,7 @@ class Listing(GeoPointMixin, Base):
             # empty string.
             if params['Longitude'] == '':
                 self.Longitude = 0
-            else if params['Latitude'] == '':
+            if params['Latitude'] == '':
                 self.Latitude = 0
 
             # Check if longitude is positive. If it is flip it to negative so
