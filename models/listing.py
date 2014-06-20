@@ -10,7 +10,7 @@ class GeoPointMixin:
     Longitude = Column(Float)
     location = Column(Geometry(geometry_type='POINT', srid=4326))
 
-    def __init__(self, latitude, longitude):
+    def __init__(self, latitude=0, longitude=0):
         self.location = 'SRID=4326;POINT({0} {1})'.format(longitude, latitude)
 
 
@@ -18,26 +18,26 @@ class Listing(GeoPointMixin, Base):
     """ A spatially aware class """
     __tablename__ = 'listing'
     id = Column(Integer, primary_key=True)
-    matrix_unique_ID = Column(Integer)
-    mls_number = Column(Integer)
-    list_price = Column(Float)
-    city = Column(String(25))
-    address = Column(String(50))
-    area_name = Column(String(25))
-    sub_area_name = Column(String(25))
-    bathrooms = Column(Integer)
-    type_dwelling = Column(String(25))
-    year_built = Column(Integer)
-    sq_footage = Column(Float)
-    parking = Column(String(25))
-    outdoor = Column(String(100))
-    numb_rooms = Column(Integer)
-    numb_beds = Column(Integer)
+    matrix_unique_ID = Column(Integer, nullable=False)
+    mls_number = Column(Integer, nullable=False)
+    list_price = Column(String(10))
+    city = Column(String(100))
+    address = Column(String(100))
+    area_name = Column(String(100))
+    sub_area_name = Column(String(100))
+    bathrooms = Column(String(10))
+    type_dwelling = Column(String(100))
+    year_built = Column(String(10))
+    sq_footage = Column(String(10))
+    parking = Column(String(100))
+    outdoor = Column(String(1000))
+    numb_rooms = Column(String(10))
+    numb_beds = Column(String(10))
     internet_comm = Column(String(2000))
     heating = Column(String(100))
-    features = Column(String(100))
-    style = Column(String(25))
-    images_location_highres = Column(String(100))
+    features = Column(String(1000))
+    style = Column(String(100))
+    images_location_hires = Column(String(100))
     images_location_photo = Column(String(100))
     images_location_thumbnail = Column(String(100))
     images_number = Column(Integer)
@@ -64,6 +64,18 @@ class Listing(GeoPointMixin, Base):
     def __init__(self, params=None):
         if not params == None:
             self.__dict__.update(params)
+            # Check if location data is missing a pass in a zero instead of an
+            # empty string.
+            if params['Longitude'] == '':
+                self.Longitude = 0
+            else if params['Latitude'] == '':
+                self.Latitude = 0
+
+            # Check if longitude is positive. If it is flip it to negative so
+            # listing doesn't show up in Russia.
+            if not params['Longitude'] == '' and float(params['Longitude']) > 0:
+                self.Longitude = -1 * float(params['Longitude'])
+
             super(Listing, self).__init__(self.Latitude, self.Longitude)
 
     def __repr__(self):
