@@ -4,5 +4,4 @@ flask
 flask-sqlalchemy
 geoalchemy2
 flask-restful
-librets
 psycopg2
