@@ -1,5 +1,10 @@
-import librets, os
+import librets, os, os.path
 from models.listing import Listing
+from database import db_session, init_db
+
+def touch(path):
+    with open(path, 'a'):
+        os.utime(path, None)
 
 def create_listing_search(session, muid_range='0+', area='S1,S2,S3,S5,S5', \
                           limit=100):
@@ -86,27 +91,28 @@ def get_listing_images(session, listing):
 
         if not os.path.exists(dest_dir):
             os.makedirs(dest_dir)
-        else:
-            break
 
-        object_request = librets.GetObjectRequest("Property", image_format)
-        object_request.AddAllObjects(listing.matrix_unique_ID)
-        response = session.GetObject(object_request)
+            object_request = librets.GetObjectRequest("Property", image_format)
+            object_request.AddAllObjects(listing.matrix_unique_ID)
+            response = session.GetObject(object_request)
         
-        object_descriptor = response.NextObject()
-        num_objects = 0
-        while (object_descriptor != None):
-            # object_key = object_descriptor.GetObjectKey()
-            object_id = object_descriptor.GetObjectId()
-            # content_type = object_descriptor.GetContentType()
-
-            with open('{dest_dir}/image-{id}.jpg'.format(dest_dir=dest_dir, \
-                      id=object_id), 'wb') as image_file:
-                image_file.write(object_descriptor.GetData())
-                image_file.close()
-
-            num_objects += 1
             object_descriptor = response.NextObject()
+            num_objects = 0
+            while (object_descriptor != None):
+                # object_key = object_descriptor.GetObjectKey()
+                object_id = object_descriptor.GetObjectId()
+                # content_type = object_descriptor.GetContentType()
+
+                with open('{dest_dir}/image-{id}.jpg'.format(dest_dir=dest_dir, \
+                          id=object_id), 'wb') as image_file:
+                    image_file.write(object_descriptor.GetData())
+                    image_file.close()
+
+                num_objects += 1
+                object_descriptor = response.NextObject()
+
+        else:
+            num_objects = len([name for name in os.listdir(dest_dir) if os.path.isfile(name)])
 
         # Update listing object
         listing.images_number = num_objects
@@ -116,24 +122,27 @@ def get_listing_images(session, listing):
 
 def main():
     """Entry point if called from the command line"""
+    touch('updated')
 
     session = librets.RetsSession("http://rets.saskmls.ca/rets/login.ashx")
     session.SetUserAgentAuthType(librets.RETS_1_5)
     session.Login('1075', '3L3ctrick!')
 
-    listing_search = create_listing_search(session, limit=5)
+    listing_search = create_listing_search(session, limit=-1)
     results = session.Search(listing_search)
 
     listings = create_listing_object_list(results)
 
     for listing in listings:
         print(listing)
-        get_listing_images(session, listing)
+        #get_listing_images(session, listing)
+        db_session.add(listing)
+        db_session.commit()
 
-    return listings
 
-if __name__ == '__main__':
-    listings = main()
+
+# if __name__ == '__main__':
+    # listings = main()
 
 
 
