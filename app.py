@@ -23,6 +23,9 @@ listing_fields = {
     'images_number': fields.Integer,
     'latitude': fields.Float(attribute='Latitude'),
     'longitude': fields.Float(attribute='Longitude'),
+    'bedrooms': fields.Integer(attribute='numb_beds'),
+    'bathrooms': fields.Integer,
+    'style': fields.String
 }
 
 class ListingsRoute(Resource):
