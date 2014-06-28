@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from database import db_session
 from models.listing import Listing
+from models.transit_stop import TransitStop
 from flask.ext.restful import Resource, Api, fields, marshal
 from flask.ext.restful.utils import cors
 
@@ -34,6 +35,20 @@ class ListingsRoute(Resource):
         return {'listings': marshal(db_session.query(Listing).all(), listing_fields)}
 
 api.add_resource(ListingsRoute, '/api/listings')
+
+transit_stop_fields = {
+    'id': fields.Integer,
+    'latitude': fields.Float,
+    'longitude': fields.Float,
+    'code': fields.String,
+    'name': fields.String
+}
+
+class TransitStopsRoute(Resource):
+    def get(self):
+        return {'transit_stops': marshal(db_session.query(TransitStop).all(), transit_stop_fields)}
+
+api.add_resource(TransitStopsRoute, '/api/transit_stops')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
