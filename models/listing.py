@@ -13,6 +13,24 @@ class GeoPointMixin:
     def __init__(self, latitude=0, longitude=0):
         self.location = 'SRID=4326;POINT({0} {1})'.format(longitude, latitude)
 
+    @property
+    def latitude(self):
+        """Provide a `latitude` property"""
+        return self.Latitude
+
+    @latitude.setter
+    def latitude(self, lat):
+        self.Latitude = lat
+
+    @property
+    def longitude(self):
+        """Provide a `longitude` property"""
+        return self.Longitude
+
+    @longitude.setter
+    def longitude(self, long):
+        self.Longitude = long
+
 
 class Listing(GeoPointMixin, Base):
     """ A spatially aware class """
