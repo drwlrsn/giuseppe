@@ -77,7 +77,9 @@ class Listing(GeoPointMixin, Base):
                         or a == 'metadata' \
                         or a == 'query' \
                         or a == 'id'
-                        or a == 'location')])
+                        or a == 'location'
+                        or a == 'latitude'
+                        or a == 'longitude')])
 
     def __init__(self, params=None):
         if not params == None:
