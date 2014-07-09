@@ -11,7 +11,7 @@ api.decorators=[cors.crossdomain(origin='*')]
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    db_session.remove()
+    database.session.remove()
 
 
 listing_fields = {
