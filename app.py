@@ -1,8 +1,7 @@
 import os
 from flask import Flask
-from database import db_session
-from models.listing import Listing
-from models.transit_stop import TransitStop
+import database
+from models import *
 from flask.ext.restful import Resource, Api, fields, marshal
 from flask.ext.restful.utils import cors
 

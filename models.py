@@ -1,36 +1,8 @@
-""" Provides a Listing class which represents a residential property in the SRAR RETS system """
-
-from sqlalchemy import Column, Integer, String, Float
-from geoalchemy2 import Geometry
+from sqlalchemy import Column, Integer, String
 from database import Base
-
-
-class GeoPointMixin:
-    Latitude = Column(Float)
-    Longitude = Column(Float)
-    location = Column(Geometry(geometry_type='POINT', srid=4326))
-
-    def __init__(self, latitude=0, longitude=0):
-        self.location = 'SRID=4326;POINT({0} {1})'.format(longitude, latitude)
-
-    @property
-    def latitude(self):
-        """Provide a `latitude` property"""
-        return self.Latitude
-
-    @latitude.setter
-    def latitude(self, lat):
-        self.Latitude = lat
-
-    @property
-    def longitude(self):
-        """Provide a `longitude` property"""
-        return self.Longitude
-
-    @longitude.setter
-    def longitude(self, long):
-        self.Longitude = long
-
+from mixins import GeoGeomMixin, GeoPointMixin
+import inspect
+from functools import wraps
 
 class Listing(GeoPointMixin, Base):
     """ A spatially aware class """
@@ -104,3 +76,67 @@ class Listing(GeoPointMixin, Base):
 
     def __repr__(self):
         return '<Listing {0}>'.format(self.matrix_unique_ID)
+
+
+def initializer(func):
+    """
+    Automatically assigns the parameters.
+    Thanks to http://stackoverflow.com/a/1389216/1179222
+    >>> class process:
+    ...     @initializer
+    ...     def __init__(self, cmd, reachable=False, user='root'):
+    ...         pass
+    >>> p = process('halt', True)
+    >>> p.cmd, p.reachable, p.user
+    ('halt', True, 'root')
+    """
+    names, varargs, keywords, defaults = inspect.getargspec(func)
+
+    @wraps(func)
+    def wrapper(self, *args, **kargs):
+        for name, arg in list(zip(names[1:], args)) + list(kargs.items()):
+            setattr(self, name, arg)
+
+        for name, default in zip(reversed(names), reversed(defaults)):
+            if not hasattr(self, name):
+                setattr(self, name, default)
+
+        func(self, *args, **kargs)
+
+    return wrapper
+
+class School(GeoGeomMixin, Base):
+    """ A spatially aware class that represents a school """
+    __tablename__ = 'school'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200))
+    city = Column(String(100))
+    street = Column(String(100))
+    house_number = Column(Integer)
+    post_code = Column(String(10))
+    phone = Column(String(15))
+    operator = Column(String(200))
+    religion = Column(String(100))
+    denomination = Column(String(100))
+
+    @initializer
+    def __init__(self, geom, religion=None, denomination=None, **kwargs):
+        super(School, self).__init__(geom)
+
+
+class TransitStop(GeoPointMixin, Base):
+    """ A spatially aware class that represents a transit stop """
+    __tablename__ = 'transit_stop'
+    id = Column(Integer, primary_key=True)
+    code = Column(String(200))
+    name = Column(String(200))
+
+    def __init__(self, code=None, name=None, latitude=None, longitude=None):
+        self.code = code
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+
+        super(TransitStop, self).__init__(latitude=latitude, longitude=longitude)
+
+
