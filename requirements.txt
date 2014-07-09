@@ -6,3 +6,4 @@ geoalchemy2
 flask-restful
 psycopg2
 pytz
+-e hg+https://bitbucket.org/venza/overpasspy#egg=OverPassPy
