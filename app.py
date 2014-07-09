@@ -31,7 +31,7 @@ listing_fields = {
 class ListingsRoute(Resource):
     
     def get(self):
-        return {'listings': marshal(db_session.query(Listing).all(), listing_fields)}
+        return {'listings': marshal(database.session.query(Listing).all(), listing_fields)}
 
 api.add_resource(ListingsRoute, '/api/listings')
 
@@ -45,9 +45,29 @@ transit_stop_fields = {
 
 class TransitStopsRoute(Resource):
     def get(self):
-        return {'transit_stops': marshal(db_session.query(TransitStop).all(), transit_stop_fields)}
+        return {'transit_stops': marshal(database.session.query(TransitStop).all(), transit_stop_fields)}
 
 api.add_resource(TransitStopsRoute, '/api/transit_stops')
+
+school_fields = {
+    'id': fields.Integer,
+    'name': fields.String,
+    'city': fields.String,
+    'street': fields.String,
+    'house_number': fields.String,
+    'operator': fields.String,
+    'religion': fields.String,
+    'denomination': fields.String,
+    'latitude': fields.Float,
+    'longitude': fields.Float
+}
+
+class SchoolsRoute(Resource):
+    def get(self):
+        return {'schools': marshal(database.session.query(School).all(), school_fields)}
+
+api.add_resource(SchoolsRoute, '/api/schools')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
