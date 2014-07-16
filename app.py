@@ -68,6 +68,22 @@ class SchoolsRoute(Resource):
 
 api.add_resource(SchoolsRoute, '/api/schools')
 
+placesofworship_fields = {
+    'id': fields.Integer,
+    'name': fields.String,
+    'city': fields.String,
+    'street': fields.String,
+    'religion': fields.String,
+    'latitude': fields.Float,
+    'longitude': fields.Float
+}
+
+class PlacesOfWorshipRoute(Resource):
+    def get(self):
+        return {'placesofworship': marshal(database.session.query(PlaceOfWorship).all(), placesofworship_fields)}
+
+api.add_resource(PlacesOfWorshipRoute, '/api/placesofworship')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
