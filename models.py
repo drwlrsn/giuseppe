@@ -139,4 +139,20 @@ class TransitStop(GeoPointMixin, Base):
 
         super(TransitStop, self).__init__(latitude=latitude, longitude=longitude)
 
+class PlaceOfWorship(GeoPointMixin, Base):
+    """A spatiallay aware class that represents a place of worship"""
+    __tablename__ = 'place_of_worship'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200))
+    city = Column(String(100))
+    address = Column(String(100))
+    post_code = Column(String(10))
+    religion = Column(String(100))
+    denomination = Column(String(100))
+
+    @initializer
+    def __init__(self, latitude=None, longitude=None, religion=None, denomination=None, **kwargs):
+        super(PlaceOfWorship, self).__init__(latitude=latitude, longitude=longitude)
+    
+
 
