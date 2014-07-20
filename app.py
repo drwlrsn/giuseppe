@@ -80,9 +80,9 @@ placesofworship_fields = {
 
 class PlacesOfWorshipRoute(Resource):
     def get(self):
-        return {'placesofworship': marshal(database.session.query(PlaceOfWorship).all(), placesofworship_fields)}
+        return {'pows': marshal(database.session.query(PlaceOfWorship).all(), placesofworship_fields)}
 
-api.add_resource(PlacesOfWorshipRoute, '/api/placesofworship')
+api.add_resource(PlacesOfWorshipRoute, '/api/pows')
 
 
 if __name__ == '__main__':
