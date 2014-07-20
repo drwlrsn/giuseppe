@@ -17,7 +17,7 @@ def get_schools():
         school['geom'] = []
         for node in school['nodes']:
             node_results = overpass.nodes.get(node)
-            school['geom'].append('{lat} {lon}'.format( \
+            school['geom'].append('{lon} {lat}'.format( \
                                   lat=node_results['lat'], \
                                   lon = node_results['lon']))
         
