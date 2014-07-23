@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, request
 import database
 from models import *
 from flask.ext.restful import Resource, Api, fields, marshal
@@ -83,6 +83,40 @@ class PlacesOfWorshipRoute(Resource):
         return {'pows': marshal(database.session.query(PlaceOfWorship).all(), placesofworship_fields)}
 
 api.add_resource(PlacesOfWorshipRoute, '/api/pows')
+
+query_fields = {
+    'id': fields.Integer
+}
+
+class ListingsQueryRoute(Resource):
+    def get(self):
+        """Possible parameters are `supermarket`, `place_of_worship`, `transit_stop`, `school`"""
+
+        supermarket_radius = request.args.get('supermarket', None, type=float)
+        pow_radius = request.args.get('place_of_worship', None, type=float)
+        transit_radius = request.args.get('transit_stop', None, type=float)
+        school_radius = request.args.get('school', None, type=float)
+
+        degrees_metre = 1 / 78710
+
+        query = database.session.query(Listing).distinct(Listing.id)
+
+        if supermarket_radius:
+            query = query.join(SuperMarket, SuperMarket.location.ST_DWithin(Listing.location, supermarket_radius * degrees_metre))
+
+        if pow_radius:
+            query = query.join(PlaceOfWorship, PlaceOfWorship.location.ST_DWithin(Listing.location, pow_radius * degrees_metre))
+
+        if transit_radius:
+            query = query.join(TransitStop, TransitStop.location.ST_DWithin(Listing.location, transit_radius * degrees_metre))
+
+        if school_radius:
+            query = query.join(School, School.geom.ST_DWithin(Listing.location, school_radius * degrees_metre))
+
+        return {'listings': marshal(query.all(), query_fields)}
+
+api.add_resource(ListingsQueryRoute, '/api/listings/filter')
+
 
 
 if __name__ == '__main__':

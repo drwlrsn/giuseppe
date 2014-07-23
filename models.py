@@ -154,5 +154,18 @@ class PlaceOfWorship(GeoPointMixin, Base):
     def __init__(self, latitude=None, longitude=None, religion=None, denomination=None, **kwargs):
         super(PlaceOfWorship, self).__init__(latitude=latitude, longitude=longitude)
     
+class SuperMarket(GeoPointMixin, Base):
+    """A spatitally aware class that represents a super market"""
+    __tablename__ = 'super_market'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200))
+    city = Column(String(100))
+    street = Column(String(100))
+    house_number = Column(String(50))
+    post_code = Column(String(10))
+    phone = Column(String(20))
+    operator = Column(String(200))
 
-
+    @initializer
+    def __init__(self, latitude=None, longitude=None, **kwargs):
+        super(SuperMarket, self).__init__(latitude=latitude, longitude=longitude)
