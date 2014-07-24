@@ -84,6 +84,19 @@ class PlacesOfWorshipRoute(Resource):
 
 api.add_resource(PlacesOfWorshipRoute, '/api/pows')
 
+supermarkets_fields = {
+    'id': fields.Integer,
+    'name': fields.String,
+    'latitude': fields.Float,
+    'longitude': fields.Float
+}
+
+class SuperMarketsRoute(Resource):
+    def get(self):
+        return {'supermarkets': marshal(database.session.query(SuperMarket).all(), supermarkets_fields)}
+
+api.add_resource(SuperMarketsRoute, '/api/supermarkets')
+
 query_fields = {
     'id': fields.Integer
 }
