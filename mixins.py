@@ -19,12 +19,12 @@ class GeoGeomMixin:
     @property
     def latitude(self):
         centroid = self._get_centroid()
-        return database.session.scalar(func.ST_X(centroid))
+        return database.session.scalar(func.ST_Y(centroid))
 
     @property
     def longitude(self):
         centroid = self._get_centroid()
-        return database.session.scalar(func.ST_Y(centroid))
+        return database.session.scalar(func.ST_X(centroid))
 
 
 class GeoPointMixin:
