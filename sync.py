@@ -153,33 +153,31 @@ def get_listing_images(session, listing):
         if not os.path.exists(dest_dir):
             os.makedirs(dest_dir)
 
-            object_request = librets.GetObjectRequest("Property", image_format)
-            object_request.AddAllObjects(listing.matrix_unique_ID)
-            response = session.GetObject(object_request)
-        
+        object_request = librets.GetObjectRequest("Property", image_format)
+        object_request.AddAllObjects(str(listing.matrix_unique_ID))
+        response = session.GetObject(object_request)
+    
+        object_descriptor = response.NextObject()
+        num_objects = 0
+        while (object_descriptor != None):
+            # object_key = object_descriptor.GetObjectKey()
+            object_id = object_descriptor.GetObjectId()
+            # content_type = object_descriptor.GetContentType()
+
+            with open('{dest_dir}/image-{id}.jpg'.format(dest_dir=dest_dir, \
+                      id=object_id), 'wb') as image_file:
+                image_file.write(object_descriptor.GetData())
+                image_file.close()
+
+            num_objects += 1
             object_descriptor = response.NextObject()
-            num_objects = 0
-            while (object_descriptor != None):
-                # object_key = object_descriptor.GetObjectKey()
-                object_id = object_descriptor.GetObjectId()
-                # content_type = object_descriptor.GetContentType()
-
-                with open('{dest_dir}/image-{id}.jpg'.format(dest_dir=dest_dir, \
-                          id=object_id), 'wb') as image_file:
-                    image_file.write(object_descriptor.GetData())
-                    image_file.close()
-
-                num_objects += 1
-                object_descriptor = response.NextObject()
-
-        else:
-            num_objects = len([name for name in os.listdir(dest_dir) if os.path.isfile(name)])
 
         # Update listing object
         listing.images_number = num_objects
         setattr(listing, \
                 'images_location_{format}'.format(format=image_format.lower()),\
                 dest_dir)
+        logging.info('Updated {0} {1} images for listing {2}'.format(num_objects, image_format, listing.matrix_unique_ID))
 
 def get_updated_datetime():
     modified = datetime.fromtimestamp(os.path.getmtime('updated'))
