@@ -133,13 +133,15 @@ def get_listing_images(session, listing):
     """
 
     image_formats = ('HiRes', 'Photo', 'Thumbnail')
-
+    logging.info('GET LISTING IMAGE')
     try:
         static_dir = os.environ['GIUSEPPE_STATIC_DIR']
     except KeyError:
         static_dir = 'static/images/listings'
 
+    logging.info('Saving images to {0}'.format(static_dir))
     if not os.path.exists(static_dir):
+        logging.info('{0} doesn\'t exist. Creating it.'.format(static_dir))
         os.makedirs(static_dir)
 
     for image_format in image_formats:
