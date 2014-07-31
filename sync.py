@@ -75,20 +75,31 @@ def create_listing_object_list(results):
 
     return listings_list
 
-def get_all_listings(session, search_request, results=[]):
-    print('get_all_listings() called')
-
-    search_results = create_listing_object_list(session.Search(search_request))
+def get_all_listings(session, list=True, muid_range='0+', area='S1,S2,S3,S5,S5', \
+                          limit=-1, last_search_datetime=None, select=None, results=[]):
+    logging.debug('GET ALL LISTINGS\nget_all_listings(list={list}, muid_range={muid_range}, area={area}, \
+          limit={limit}, last_search_datetime={last_search_datetime}, \
+          select={select}) called'.format(list=list, muid_range=muid_range, \
+                                            area=area, limit=limit, \
+                                            last_search_datetime=last_search_datetime, \
+                                            select=select))
+    search_request = create_listing_search(session, muid_range, area, limit, \
+                                           last_search_datetime, select)
+    if list:
+        search_results = create_listing_muid_list(session.Search(search_request))
+    else:
+        search_results = create_listing_object_list(session.Search(search_request))
+    
     if not search_results:
         return results
     results += search_results
 
-    return get_all_listings(session, \
-                              create_listing_search(session, \
-                                                    muid_range='{0}+'\
-                                                    .format(int(results[-1]\
-                                                    .matrix_unique_ID) + 1)), \
-                                                    results=results)
+    try:
+        muid_range='{0}+'.format(int(results[-1].matrix_unique_ID) + 1)
+    except AttributeError:
+        muid_range='{0}+'.format(int(results[-1]) + 1)
+
+    return get_all_listings(session, muid_range=muid_range, area=area, limit=limit, last_search_datetime=last_search_datetime, select=select, results=results)
 
 def create_listing_muid_list(results):
     """ Takes the results of :func:`librets.RetsSession.Search` and returns a 
