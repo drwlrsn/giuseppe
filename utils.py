@@ -1,5 +1,5 @@
 import pytz
-from models.transit_stop import TransitStop
+from models import TransitStop
 import sys, csv
 from database import db_session
 
