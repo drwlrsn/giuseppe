@@ -207,7 +207,22 @@ def create_session():
 
     return session
 
+def clean_listing_images(session, listings):
+    logging.info('CLEAN LISTING IMAGES')
+    try:
+        listings_image_dir = os.environ['GIUSEPPE_STATIC_DIR']
+    except KeyError:
+        listings_image_dir = 'static/images/listings'
 
+    for listing in listings:
+        logging.debug('Cleaning listing {0}'.format(listing.matrix_unique_ID))
+        try:
+            shutil.rmtree(listings + listing.mls_number)
+            logging.debug('Removed listing {0}'.format(listing.matrix_unique_ID))
+        except shutil.Error as error:
+            logging.error('Could not remove image directors for listing {0}.'.format(listing.matrix_unique_ID))
+            logging.exception(error)
+    logging.info('Successfully removed images for {0} listings.'.format(len(listings)))
 
 
         db_session.commit()
