@@ -1,5 +1,5 @@
 import librets, os, os.path
-from models.listing import Listing
+from models import Listing
 from database import db_session, init_db
 from datetime import datetime
 from utils import to_utc
