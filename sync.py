@@ -5,6 +5,7 @@ from datetime import datetime
 from utils import to_utc
 import logging
 from sqlalchemy import func, exc
+import shutil
 
 logging.basicConfig(level=logging.DEBUG)
 
