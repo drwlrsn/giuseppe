@@ -4,6 +4,7 @@ from database import db_session, init_db
 from datetime import datetime
 from utils import to_utc
 import logging
+from sqlalchemy import func, exc
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -273,7 +274,21 @@ def clean_listings():
         logging.critical('Failed clean listings!')
         logging.exception(error)
 
+def fix_listing_images(session):
+    logging.info('FIX LISTING IMAGES')
+    results = db_session.query(Listing).filter_by(images_location_hires = None).all()
+    logging.info('Found {0} listings missing images.'.format(len(results)))
+    for result in results:
+        get_listing_images(session, result)
+
+    try:
         db_session.commit()
+        logging.info('Fixed listing images.')
+    except exc.InvalidRequestError as error:
+        logging.error('Could not commit changes to database!')
+        logging.exception(error)
+
+
 
 def main():
     """Entry point if called from the command line"""
