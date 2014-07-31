@@ -3,6 +3,9 @@ from models import Listing
 from database import db_session, init_db
 from datetime import datetime
 from utils import to_utc
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 def touch(path):
     with open(path, 'a'):
