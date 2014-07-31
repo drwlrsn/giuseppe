@@ -174,36 +174,51 @@ def get_updated_datetime():
 def datetime_to_rets_time(datetime_obj):
     return datetime_obj.strftime('%Y-%m-%dT%H:%M:%S')
 
-def update_listing_table(session, listings):
+def update_listing_table(session):
+    logging.info('UPDATE LISTINGS')
+    listings = get_updated_listings(session)
     for listing in listings:
-        db_obj = db_session.query(Listing).filter_by(matrix_unique_ID = \
+        result = db_session.query(Listing).filter_by(matrix_unique_ID = \
                                             int(listing.matrix_unique_ID))\
                                             .first()
-        if db_obj == None:
+        if result == None:
+            logging.debug('Listing {0} not found. Adding to session.'.format(listing))
             db_session.add(listing)
         else:
-            db_obj.update(listing)
-            db_session.add(db_obj)
+            logging.debug('Listing {0} found. Updating object and merging in session.'.format(listing))
+            listing.id = result.id
+            db_session.merge(listing)
+
+        get_listing_images(session, listing)
 
         db_session.commit()
+
+        logging.debug('Updated {0}'.format(listing.matrix_unique_ID))
+
+    logging.info('Updated {0} listings.'.format(len(listings)))
 
 def get_updated_listings(session):
     """Returns an array of `Listings` that have been updated since 
     `last_update`
     """
+    touch('updated')
     last_updated = datetime_to_rets_time(get_updated_datetime())
     listing_search = create_listing_search(session, \
                                            last_search_datetime=last_updated)
-    touch('updated')
     results = session.Search(listing_search)
     listing_objs = create_listing_object_list(results)    
+
+    logging.info('Found {0} listings since {1}'.format(len(listing_objs), last_updated))
 
     return listing_objs
 
 def create_session():
     session = librets.RetsSession("http://rets.saskmls.ca/rets/login.ashx")
     session.SetUserAgentAuthType(librets.RETS_1_5)
-    session.Login('1075', '3L3ctrick!')
+    try:
+        session.Login('1075', '3L3ctrick!')
+    except:
+        logging.critical("Unable to login to SRAR RETS.")
 
     return session
 
