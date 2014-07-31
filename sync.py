@@ -207,31 +207,29 @@ def create_session():
 
     return session
 
-def main():
-    """Entry point if called from the command line"""
-    touch('updated')
 
-    session = librets.RetsSession("http://rets.saskmls.ca/rets/login.ashx")
-    session.SetUserAgentAuthType(librets.RETS_1_5)
-    session.Login('1075', '3L3ctrick!')
 
-    listings_list = []
 
-    while not listings:
-        listing_search = create_listing_search(session, limit=-1)
-        results = session.Search(listing_search)
-        listings = create_listing_object_list(results)
-
-    for listing in listings:
-        print(listing)
-        #get_listing_images(session, listing)
-        db_session.add(listing)
         db_session.commit()
 
+def main():
+    """Entry point if called from the command line"""
+    logging.info('RECREATING LISTING TABLE')
+    rows_deleted = db_session.query(Listing).delete()
+    logging.info('Deleted {0} rows.'.format(rows_deleted))
 
+    session = create_session()
+    touch('updated')
+    listings = get_all_listings(session, list=False)
+    for listing in listings:
+        get_listing_images(session, listing)
+    db_session.add_all(listings)
+    db_session.commit()
 
-# if __name__ == '__main__':
-    # listings = main()
+    logging.info('Added {0} listings.'.format(len(listings)))
+
+if __name__ == '__main__':
+    main()
 
 
 
