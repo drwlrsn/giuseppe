@@ -224,6 +224,26 @@ def clean_listing_images(session, listings):
             logging.exception(error)
     logging.info('Successfully removed images for {0} listings.'.format(len(listings)))
 
+def clean_listings():
+    """Removes listings that no longer appear in SRAR RETS DB"""
+    logging.info('CLEAN LISTINGS')
+    session = create_session()
+    listings = get_all_listings(session, select='matrix_unique_ID')
+    logging.debug("Listings to be cleaned: {0}".format(listings))
+    stale_listings = db_session.query(Listing.matrix_unique_ID).filter(~Listing.matrix_unique_ID.in_(listings)).all()
+    num_listings = len(stale_listings)
+
+    clean_listing_images(session, stale_listings)
+
+    try:
+        db_session.query(Listing.matrix_unique_ID).filter(~Listing.matrix_unique_ID.in_(listings)).delete(synchronize_session='fetch')
+        db_session.commit()
+        logging.info('Removed {0} listings.'.format(num_listings))
+        logging.debug('Listings removed: {0}'.format(', '.join([str(listing.matrix_unique_ID) for listing in stale_listings])))
+    except Exception as error:
+        db_session.rollback()
+        logging.critical('Failed clean listings!')
+        logging.exception(error)
 
         db_session.commit()
 
