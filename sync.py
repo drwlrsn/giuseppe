@@ -260,7 +260,7 @@ def clean_listings():
     session = create_session()
     listings = get_all_listings(session, select='matrix_unique_ID')
     logging.debug("Listings to be cleaned: {0}".format(listings))
-    stale_listings = db_session.query(Listing.matrix_unique_ID).filter(~Listing.matrix_unique_ID.in_(listings)).all()
+    stale_listings = db_session.query(Listing).filter(~Listing.matrix_unique_ID.in_(listings)).all()
     num_listings = len(stale_listings)
 
     clean_listing_images(session, stale_listings)
