@@ -282,13 +282,13 @@ def fix_listing_images(session):
     for result in results:
         get_listing_images(session, result)
 
-    try:
-        db_session.commit()
-        logging.info('Fixed listing images.')
-    except exc.InvalidRequestError as error:
-        logging.error('Could not commit changes to database!')
-        logging.exception(error)
+        try:
+            db_session.commit()
+        except exc.InvalidRequestError as error:
+            logging.error('Could not commit changes to database!')
+            logging.exception(error)
 
+    logging.info('Fixed listing images.')
 
 
 def main():
