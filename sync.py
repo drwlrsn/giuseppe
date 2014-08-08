@@ -6,6 +6,7 @@ from utils import to_utc
 import logging
 from sqlalchemy import func, exc
 import shutil
+import os
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -246,9 +247,9 @@ def clean_listing_images(session, listings):
     for listing in listings:
         logging.debug('Cleaning listing {0}'.format(listing.matrix_unique_ID))
         try:
-            shutil.rmtree(listings + listing.mls_number)
+            shutil.rmtree(os.path.join(listings_image_dir, str(listing.mls_number)))
             logging.debug('Removed listing {0}'.format(listing.matrix_unique_ID))
-        except shutil.Error as error:
+        except FileNotFoundError as error:
             logging.error('Could not remove image directors for listing {0}.'.format(listing.matrix_unique_ID))
             logging.exception(error)
     logging.info('Successfully removed images for {0} listings.'.format(len(listings)))
