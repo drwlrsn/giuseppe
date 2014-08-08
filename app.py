@@ -126,7 +126,7 @@ class ListingsQueryRoute(Resource):
         if school_radius:
             query = query.join(School, School.geom.ST_DWithin(Listing.location, school_radius * degrees_metre))
 
-        return {'listings': marshal(query.all(), query_fields)}
+        return {'listings': marshal(query.all(), listing_fields)}
 
 api.add_resource(ListingsQueryRoute, '/api/listings/filter')
 
