@@ -228,6 +228,7 @@ def get_updated_listings(session):
 def create_session():
     session = librets.RetsSession("http://rets.saskmls.ca/rets/login.ashx")
     session.SetUserAgentAuthType(librets.RETS_1_5)
+    session.SetModeFlags = session.MODE_NO_EXPECT
     try:
         session.Login('1075', '3L3ctrick!')
     except:
