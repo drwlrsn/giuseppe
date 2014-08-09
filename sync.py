@@ -215,8 +215,8 @@ def get_updated_listings(session):
     """Returns an array of `Listings` that have been updated since 
     `last_update`
     """
-    touch('updated')
     last_updated = datetime_to_rets_time(get_updated_datetime())
+    touch('updated')
     listing_search = create_listing_search(session, \
                                            last_search_datetime=last_updated)
     results = session.Search(listing_search)
