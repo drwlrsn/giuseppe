@@ -19,7 +19,7 @@ listing_fields = {
     'mls_number': fields.Integer,
     'list_price': fields.Float,
     'address': fields.String,
-    'images_location_thumbnail': fields.String,
+    'images_location': fields.String(attribute='images_location_photo'),
     'images_number': fields.Integer,
     'latitude': fields.Float(attribute='Latitude'),
     'longitude': fields.Float(attribute='Longitude'),
