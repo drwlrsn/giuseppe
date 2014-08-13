@@ -8,7 +8,7 @@ from sqlalchemy import func, exc
 import shutil
 import os
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 def touch(path):
     with open(path, 'a'):
