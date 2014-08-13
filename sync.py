@@ -302,8 +302,8 @@ def main():
     listings = get_all_listings(session, list=False)
     for listing in listings:
         get_listing_images(session, listing)
-    db_session.add_all(listings)
-    db_session.commit()
+        db_session.add(listing)
+        db_session.commit()
 
     logging.info('Added {0} listings.'.format(len(listings)))
 
