@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float
 from database import Base
 from mixins import GeoGeomMixin, GeoPointMixin
 import inspect
@@ -10,19 +10,19 @@ class Listing(GeoPointMixin, Base):
     id = Column(Integer, primary_key=True)
     matrix_unique_ID = Column(Integer, nullable=False)
     mls_number = Column(Integer, nullable=False)
-    list_price = Column(String(10))
+    list_price = Column(Float)
     city = Column(String(100))
     address = Column(String(100))
     area_name = Column(String(100))
     sub_area_name = Column(String(100))
-    bathrooms = Column(String(10))
+    bathrooms = Column(Integer)
     type_dwelling = Column(String(100))
     year_built = Column(String(10))
     sq_footage = Column(String(10))
     parking = Column(String(100))
     outdoor = Column(String(1000))
-    numb_rooms = Column(String(10))
-    numb_beds = Column(String(10))
+    numb_rooms = Column(Integer)
+    numb_beds = Column(Integer)
     internet_comm = Column(String(2000))
     heating = Column(String(100))
     features = Column(String(1000))
