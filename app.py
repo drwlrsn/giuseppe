@@ -26,13 +26,71 @@ listing_fields = {
     'bedrooms': fields.Integer(attribute='numb_beds'),
     'bathrooms': fields.Integer,
     'style': fields.String,
-    'broker_name': fields.String
+    'broker_name': fields.String,
+    'neighbourhood': fields.String(attribute='sub_area_name')
 }
 
 class ListingsRoute(Resource):
     
     def get(self):
-        return {'listings': marshal(database.session.query(Listing).all(), listing_fields)}
+        import csv
+        query = database.session.query(Listing).distinct(Listing.id)
+
+        if request.args:
+            degrees_metre = 1 / 78710
+            priceLow = request.args.get('priceLow', None, type=float)
+            priceHigh = request.args.get('priceHigh', None, type=float)
+            supermarket_radius = request.args.get('supermarket', None, type=float)
+            pow_radius = request.args.get('place_of_worship', None, type=float)
+            transit_radius = request.args.get('transit_stop', None, type=float)
+            school_radius = request.args.get('school', None, type=float)
+            neighbourhood = request.args.get('neighbourhood', None)
+            bedrooms = request.args.get('bedrooms', None, type=int)
+            bathrooms = request.args.get('bathrooms', None, type=int)
+            school_filter = request.args.get('schoolFilter', None, type=str)
+            style = request.args.get('style', None, type=str)
+
+            if priceLow:
+                query = query.filter(Listing.list_price >= priceLow)
+
+            if priceHigh:
+                query = query.filter(Listing.list_price <= priceHigh)
+
+            if neighbourhood:
+                query = query.filter(Listing.sub_area_name.startswith(neighbourhood))
+
+            if bedrooms:
+                query = query.filter(Listing.numb_beds == bedrooms)
+
+            if bathrooms:
+                query = query.filter(Listing.bathrooms == bathrooms)
+
+            if style:
+                query = query.filter(Listing.style == style)
+
+            if supermarket_radius:
+                query = query.join(SuperMarket, SuperMarket.location.ST_DWithin(Listing.location, supermarket_radius * degrees_metre))
+
+            if pow_radius:
+                query = query.join(PlaceOfWorship, PlaceOfWorship.location.ST_DWithin(Listing.location, pow_radius * degrees_metre))
+
+            if transit_radius:
+                query = query.join(TransitStop, TransitStop.location.ST_DWithin(Listing.location, transit_radius * degrees_metre))
+
+            if school_radius:
+                if school_filter:
+                    school_boards = school_filter.split(',')
+                    if 'catholic' in school_boards:
+                        query = query.join(School, School.geom.ST_DWithin(Listing.location, school_radius * degrees_metre)).filter(School.operator == 'Greater Saskatoon Catholic Schools')
+                    if 'public' in school_boards:
+                        query = query.join(School, School.geom.ST_DWithin(Listing.location, school_radius * degrees_metre)).filter(School.operator == 'Saskatoon Public Schools')
+                    if 'other' in school_boards:
+                        query = query.join(School, School.geom.ST_DWithin(Listing.location, school_radius * degrees_metre)).filter(School.operator != 'Saskatoon Public Schools').filter(School.operator != 'Greater Saskatoon Catholic Schools')
+                else:
+                    query = query.join(School, School.geom.ST_DWithin(Listing.location, school_radius * degrees_metre))
+        
+        results = query.all()
+        return {'listings': marshal(results, listing_fields)}
 
 api.add_resource(ListingsRoute, '/api/listings')
 
