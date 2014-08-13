@@ -15,7 +15,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.alter_column('listing', sa.Column('list_price', sa.Float()))
+    op.execute('ALTER TABLE listing ALTER COLUMN list_price TYPE float8 USING (trim(list_price)::float8);')
 
 
 def downgrade():
