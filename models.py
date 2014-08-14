@@ -27,7 +27,7 @@ class Listing(GeoPointMixin, Base):
     heating = Column(String(100))
     features = Column(String(1000))
     style = Column(String(100))
-    condo_fees = Column(String(100))
+    condo_fees = Column(Float)
     condo_name = Column(String(200))
     broker_name = Column(String(200))
     Matrix_Modified_DT = Column(String(100))
