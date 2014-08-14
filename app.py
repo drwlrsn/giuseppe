@@ -27,7 +27,9 @@ listing_fields = {
     'bathrooms': fields.Integer,
     'style': fields.String,
     'broker_name': fields.String,
-    'neighbourhood': fields.String(attribute='sub_area_name')
+    'neighbourhood': fields.String(attribute='sub_area_name'),
+    'type_dwelling': fields.String,
+    'condo_fees': fields.Float
 }
 
 class ListingsRoute(Resource):
@@ -48,7 +50,7 @@ class ListingsRoute(Resource):
             bedrooms = request.args.get('bedrooms', None, type=int)
             bathrooms = request.args.get('bathrooms', None, type=int)
             school_filter = request.args.get('schoolFilter', None, type=str)
-            style = request.args.get('style', None, type=str)
+            type = request.args.get('type', None, type=str)
 
             if priceLow:
                 query = query.filter(Listing.list_price >= priceLow)
@@ -65,8 +67,13 @@ class ListingsRoute(Resource):
             if bathrooms:
                 query = query.filter(Listing.bathrooms == bathrooms)
 
-            if style:
-                query = query.filter(Listing.style == style)
+            if type:
+                if type == 'condominium':
+                    query = query.filter(Listing.type_dwelling == 'CONDOMINIUM')
+                if type == 'vacant lot':
+                    query = query.filter(Listing.type_dwelling == 'VACANT LOT')
+                if type == 'residential':
+                    query = query.filter(Listing.type_dwelling != 'VACANT LOT').filter(Listing.type_dwelling != 'CONDOMINIUM')
 
             if supermarket_radius:
                 query = query.join(SuperMarket, SuperMarket.location.ST_DWithin(Listing.location, supermarket_radius * degrees_metre))
