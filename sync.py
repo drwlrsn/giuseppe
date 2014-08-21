@@ -188,9 +188,13 @@ def get_updated_datetime():
 def datetime_to_rets_time(datetime_obj):
     return datetime_obj.strftime('%Y-%m-%dT%H:%M:%S')
 
-def update_listing_table(session):
+def update_listing_table(session, date=None):
     logging.info('UPDATE LISTINGS')
-    listings = get_updated_listings(session)
+    if date:
+        listings = get_updated_listings(session, date=date)
+    else:
+        listings = get_updated_listings(session)
+
     for listing in listings:
         result = db_session.query(Listing).filter_by(matrix_unique_ID = \
                                             int(listing.matrix_unique_ID))\
@@ -211,11 +215,14 @@ def update_listing_table(session):
 
     logging.info('Updated {0} listings.'.format(len(listings)))
 
-def get_updated_listings(session):
+def get_updated_listings(session, date=None):
     """Returns an array of `Listings` that have been updated since 
-    `last_update`
+    `last_update
     """
-    last_updated = datetime_to_rets_time(get_updated_datetime())
+    if date:
+        last_updated = datetime_to_rets_time(date)
+    else:
+        last_updated = datetime_to_rets_time(get_updated_datetime())
     touch('updated')
     listing_search = create_listing_search(session, \
                                            last_search_datetime=last_updated)
