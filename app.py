@@ -20,6 +20,7 @@ listing_fields = {
     'list_price': fields.Float,
     'address': fields.String,
     'images_location': fields.String(attribute='images_location_photo'),
+    'images_large': fields.String(attribute='images_location_hires'),
     'images_number': fields.Integer,
     'latitude': fields.Float(attribute='Latitude'),
     'longitude': fields.Float(attribute='Longitude'),
@@ -29,7 +30,11 @@ listing_fields = {
     'broker_name': fields.String,
     'neighbourhood': fields.String(attribute='sub_area_name'),
     'type_dwelling': fields.String,
-    'condo_fees': fields.Float
+    'condo_fees': fields.Float,
+    'description': fields.String(attribute='internet_comm'),
+    'sq_footage': fields.String,
+    'year_built': fields.String,
+    'condo_name': fields.String
 }
 
 class ListingsRoute(Resource):
