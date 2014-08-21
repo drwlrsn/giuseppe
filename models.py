@@ -66,6 +66,8 @@ class Listing(GeoPointMixin, Base):
                 self.Longitude = 0
             if params['Latitude'] == '':
                 self.Latitude = 0
+            if params['condo_fees'] == '':
+                self.condo_fees = 0
 
             # Check if longitude is positive. If it is flip it to negative so
             # listing doesn't show up in Russia.
