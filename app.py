@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 import database
 from models import *
 from flask.ext.restful import Resource, Api, fields, marshal
@@ -67,10 +67,10 @@ class ListingsRoute(Resource):
                 query = query.filter(Listing.sub_area_name.startswith(neighbourhood))
 
             if bedrooms:
-                query = query.filter(Listing.numb_beds == bedrooms)
+                query = query.filter(Listing.numb_beds >= bedrooms)
 
             if bathrooms:
-                query = query.filter(Listing.bathrooms == bathrooms)
+                query = query.filter(Listing.bathrooms >= bathrooms)
 
             if type:
                 if type == 'condominium':
@@ -200,6 +200,11 @@ class ListingsQueryRoute(Resource):
         return {'listings': marshal(query.all(), listing_fields)}
 
 api.add_resource(ListingsQueryRoute, '/api/listings/filter')
+
+import os
+@app.route('/static/<path:path>')
+def send_foo(path):
+    return app.send_static_file(os.path.join('static/', path))
 
 
 
