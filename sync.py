@@ -191,6 +191,13 @@ def get_updated_datetime():
     return to_sask(modified)
 
 def datetime_to_rets_time(datetime_obj):
+    """ Creates a date string in the format RETS expects from a 
+    :class:`datetime.datetime`.
+    :param datetime_obj: To be converted to string.
+    :datetime_obj type: :class:`datetime.datetime`
+    :returns: A RETS formatted date string.
+    :rtype: str
+    """
     return datetime_obj.strftime('%Y-%m-%dT%H:%M:%S')
 
 def update_listing_table(session, date=None):
