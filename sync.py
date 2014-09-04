@@ -2,7 +2,7 @@ import librets, os, os.path
 from models import Listing
 from database import db_session, init_db
 from datetime import datetime
-from utils import to_utc
+from utils import to_utc, to_sask
 import logging
 from sqlalchemy import func, exc
 import shutil
@@ -181,9 +181,14 @@ def get_listing_images(session, listing):
         logging.info('Updated {0} {1} images for listing {2}'.format(num_objects, image_format, listing.matrix_unique_ID))
 
 def get_updated_datetime():
-    modified = datetime.fromtimestamp(os.path.getmtime('updated'))
+    """ Determines the last time the listing table was updated. 
+    :returns: Returns RETS local modified time.
+    :rtype: :class:`datetime.datetime`
+    """
+    # `modified` is in UTC and timezone naive.
+    modified = datetime.utcfromtimestamp(os.path.getmtime('updated'))
 
-    return to_utc(modified)
+    return to_sask(modified)
 
 def datetime_to_rets_time(datetime_obj):
     return datetime_obj.strftime('%Y-%m-%dT%H:%M:%S')
@@ -220,6 +225,7 @@ def get_updated_listings(session, date=None):
     `last_update
     """
     if date:
+        # Assume local time is being specified.
         last_updated = datetime_to_rets_time(date)
     else:
         last_updated = datetime_to_rets_time(get_updated_datetime())

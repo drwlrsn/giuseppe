@@ -17,8 +17,20 @@ def to_utc(dt):
     localized_datetime = cst.localize(dt)
 
     return localized_datetime.astimezone(pytz.UTC)
-    
 
+def to_sask(dt):
+    u"""Converts a UTC datetime to Saskatchewan local time
+
+    Args:
+        dt (datetime): A timezone naive object containing a UTC datetime
+
+    Returns:
+        datetime  A datetime object in the 'America/Regina' timezone
+
+    """
+    localized_datetime = dt.replace(tzinfo=pytz.UTC)
+    return localized_datetime.astimezone(pytz.timezone(u'America/Regina'))
+    
 def load_transit_stops(transit_stops_file):
     transit_stops = []
     with open(transit_stops_file, 'r') as f:
